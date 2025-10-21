@@ -17,36 +17,36 @@ class AuraApp extends StatelessWidget {
       title: 'Aura',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.light,
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF3B82F6), // A confident, modern blue
-          secondary: Color(0xFF9333EA), // A vibrant secondary accent
-          surface: Color(0xFFFFFFFF),
-          background: Color(0xFFF0F2F5), // A clean, bright background
-          onPrimary: Colors.white,
-          onSecondary: Colors.white,
-          onSurface: Color(0xFF111827), // Dark, clear text
-          onBackground: Color(0xFF111827),
-        ),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF60A5FA), // A brighter blue for dark mode
-          secondary: Color(0xFFA78BFA),
-          surface: Color(0xFF1E293B), // A deep, cool grey
-          background: Color(0xFF0F172A), // A near-black background
+          primary: Color(0xFF60A5FA), // Bright blue for dark mode
+          secondary: Color(0xFFA78BFA), // Purple accent
+          surface: Color(0xFF1E293B), // Deep cool grey
+          background: Color(0xFF0F172A), // Near-black background
           onPrimary: Color(0xFF0F172A),
           onSecondary: Color(0xFF0F172A),
-          onSurface: Color(0xFFF8FAFC), // Bright, clear text
+          onSurface: Color(0xFFF8FAFC), // Bright clear text
           onBackground: Color(0xFFF8FAFC),
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode.system,
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF60A5FA), // Bright blue for dark mode
+          secondary: Color(0xFFA78BFA), // Purple accent
+          surface: Color(0xFF1E293B), // Deep cool grey
+          background: Color(0xFF0F172A), // Near-black background
+          onPrimary: Color(0xFF0F172A),
+          onSecondary: Color(0xFF0F172A),
+          onSurface: Color(0xFFF8FAFC), // Bright clear text
+          onBackground: Color(0xFFF8FAFC),
+        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        useMaterial3: true,
+      ),
+      themeMode: ThemeMode.dark,
       home: const MainNavigationScreen(),
     );
   }
@@ -84,6 +84,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         },
         elevation: 0,
         height: 70,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
