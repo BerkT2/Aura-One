@@ -1,273 +1,234 @@
+import 'dart:ui';
 import 'package:aura/screens/maps_screen.dart';
 import 'package:aura/screens/movies_screen.dart';
-import 'package:aura/screens/other_screen.dart';
 import 'package:aura/screens/products_screen.dart';
 import 'package:aura/screens/recipes_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final pageController = PageController(viewportFraction: 0.85);
-
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        toolbarHeight: 80,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Aura',
-          style: Theme.of(context)
-              .textTheme
-              .headlineMedium
-              ?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              child: const Icon(Icons.person_outline),
-            ),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        children: [
-          _buildUrlSection(context, pageController),
-          const SizedBox(height: 24),
+      body: CustomScrollView(
+        slivers: [
+          _buildAppBar(context),
+          _buildTitle(context, 'Analysis'),
+          _buildUrlCard(context),
+          _buildTitle(context, 'Quick Actions'),
           _buildQuickActions(context),
-          const SizedBox(height: 24),
-          _buildRecentActivity(context),
+          _buildTitle(context, 'Recent Insights'),
+          _buildRecentInsights(context),
         ],
       ),
     );
   }
 
-  Widget _buildUrlSection(
-      BuildContext context, PageController pageController) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 200,
-          child: PageView(
-            controller: pageController,
-            children: [
-              _buildUrlCard(context),
-              _buildInfoCard(context),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        SmoothPageIndicator(
-          controller: pageController,
-          count: 2,
-          effect: WormEffect(
-            dotHeight: 8,
-            dotWidth: 8,
-            activeDotColor: Theme.of(context).colorScheme.primary,
-            dotColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+  SliverAppBar _buildAppBar(BuildContext context) {
+    return SliverAppBar(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      pinned: true,
+      elevation: 0,
+      title: Text('Aura', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: IconButton(
+            icon: const Icon(Icons.notifications_none_outlined, size: 28),
+            onPressed: () {},
           ),
         ),
       ],
     );
   }
-
-  Widget _buildUrlCard(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.7),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Analyze Content from URL',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            const Spacer(),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Enter URL...',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                filled: true,
-                fillColor: Colors.white.withOpacity(0.1),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                ),
-                child: const Text('Analyze'),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+  
+  SliverToBoxAdapter _buildTitle(BuildContext context, String title) {
+    return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildUrlCard(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Analyze from URL',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Get instant insights from any article, video, or link.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
+                      ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Paste your link here...',
+                          filled: true,
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Go'),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildQuickActions(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 120,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           children: [
-            Icon(
-              Icons.info_outline,
-              color: Theme.of(context).colorScheme.primary,
-              size: 32,
-            ),
-            const Spacer(),
-            Text(
-              'What can Aura do?',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Aura can analyze articles, videos, and more to give you instant insights.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
-            ),
+            _buildActionCard(context, 'Maps', Icons.map_outlined, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MapsScreen()))),
+            _buildActionCard(context, 'Recipes', Icons.restaurant_menu_outlined, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RecipesScreen()))),
+            _buildActionCard(context, 'Products', Icons.shopping_bag_outlined, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductsScreen()))),
+            _buildActionCard(context, 'Movies', Icons.movie_outlined, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MoviesScreen()))),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Quick Actions',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildActionIcon(context, Icons.map_outlined, 'Maps', () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MapsScreen()))),
-              _buildActionIcon(context, Icons.restaurant_menu, 'Recipes', () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RecipesScreen()))),
-              _buildActionIcon(context, Icons.shopping_bag_outlined, 'Products', () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductsScreen()))),
-              _buildActionIcon(context, Icons.movie_outlined, 'Movies', () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MoviesScreen()))),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionIcon(
-      BuildContext context, IconData icon, String label, VoidCallback onTap) {
+  Widget _buildActionCard(BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
-            ),
-            child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentActivity(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Recent Activity',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          _buildActivityItem(context, Icons.article_outlined, 'Article Analyzed', 'on TechCrunch'),
-          const Divider(height: 32),
-          _buildActivityItem(context, Icons.videocam_outlined, 'Video Analyzed', 'from YouTube'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityItem(
-      BuildContext context, IconData icon, String title, String subtitle) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+      child: Container(
+        width: 100,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
         ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
-            Text(subtitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6))),
+            Icon(
+              icon,
+              size: 32,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(height: 8),
+            Text(title, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500)),
           ],
         ),
-        const Spacer(),
-        const Icon(Icons.arrow_forward_ios, size: 16),
-      ],
+      ),
+    );
+  }
+
+  SliverList _buildRecentInsights(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate(
+        [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: _buildInsightCard(context, 'Tech Article', 'Summary of AI advancements', Icons.article_outlined),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: _buildInsightCard(context, 'Productivity Video', 'Key takeaways from the latest huberman lab', Icons.videocam_outlined),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInsightCard(BuildContext context, String title, String subtitle, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+          ),
+        ],
+      ),
     );
   }
 }

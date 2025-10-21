@@ -17,42 +17,34 @@ class AuraApp extends StatelessWidget {
       title: 'Aura',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0057FF), // A strong, professional blue
-          brightness: Brightness.light,
-          primary: const Color(0xFF0057FF),
-          surface: const Color(0xFFFFFFFF), 
-          background: const Color(0xFFF4F7FC), // A light grey background
-          onSurface: const Color(0xFF0D1117), // Dark text for readability
+        brightness: Brightness.light,
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF3B82F6), // A confident, modern blue
+          secondary: Color(0xFF9333EA), // A vibrant secondary accent
+          surface: Color(0xFFFFFFFF),
+          background: Color(0xFFF0F2F5), // A clean, bright background
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Color(0xFF111827), // Dark, clear text
+          onBackground: Color(0xFF111827),
         ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
         useMaterial3: true,
-        textTheme: GoogleFonts.manropeTextTheme(), // A clean, modern font
-        cardTheme: CardThemeData(
-          elevation: 0,
-          color: const Color(0xFFFFFFFF),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4C8CFF),
-          brightness: Brightness.dark,
-          primary: const Color(0xFF4C8CFF),
-          surface: const Color(0xFF161B22), // A dark, slightly blue surface
-          background: const Color(0xFF0D1117), // A deep black background
-          onSurface: const Color(0xFFE6EDF3),
+        brightness: Brightness.dark,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF60A5FA), // A brighter blue for dark mode
+          secondary: Color(0xFFA78BFA),
+          surface: Color(0xFF1E293B), // A deep, cool grey
+          background: Color(0xFF0F172A), // A near-black background
+          onPrimary: Color(0xFF0F172A),
+          onSecondary: Color(0xFF0F172A),
+          onSurface: Color(0xFFF8FAFC), // Bright, clear text
+          onBackground: Color(0xFFF8FAFC),
         ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         useMaterial3: true,
-        textTheme: GoogleFonts.manropeTextTheme(ThemeData.dark().textTheme),
-        cardTheme: CardThemeData(
-          elevation: 0,
-          color: const Color(0xFF161B22),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
       ),
       themeMode: ThemeMode.system,
       home: const MainNavigationScreen(),
