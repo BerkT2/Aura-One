@@ -1,9 +1,11 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:aura/screens/maps_screen.dart';
 import 'package:aura/screens/movies_screen.dart';
 import 'package:aura/screens/products_screen.dart';
 import 'package:aura/screens/recipes_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,398 +14,428 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late AnimationController _floatController;
+  late AnimationController _pulseController;
+  late AnimationController _shimmerController;
   final TextEditingController _urlController = TextEditingController();
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _floatController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-    _animationController.forward();
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+    
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat();
+    
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2500),
+    )..repeat();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _floatController.dispose();
+    _pulseController.dispose();
+    _shimmerController.dispose();
     _urlController.dispose();
-    _pageController.dispose();
     super.dispose();
-  }
-
-  void _analyzeUrl() {
-    if (_urlController.text.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Analyzing: ${_urlController.text}'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
-        ),
-      );
-      _urlController.clear();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          _buildModernAppBar(context),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
-          _buildCarouselSection(context),
-          _buildSectionTitle(context, 'Explore'),
-          _buildCategoryGrid(context),
-          const SliverToBoxAdapter(child: SizedBox(height: 120)),
+      body: Stack(
+        children: [
+          _buildAnimatedBackground(),
+          SafeArea(
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                _buildHeader(),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                _buildHeroCard(),
+                const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                _buildQuickStats(),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                _buildSectionTitle('Quick Access'),
+                const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                _buildCategoryGrid(),
+                const SliverToBoxAdapter(child: SizedBox(height: 140)),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  SliverAppBar _buildModernAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 95,
-      floating: true,
-      pinned: true,
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      flexibleSpace: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.05),
-                ],
-              ),
-            ),
-            child: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 24, bottom: 14),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.secondary,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.auto_awesome, size: 20, color: Colors.white),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Aura',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onBackground,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  SliverToBoxAdapter _buildCarouselSection(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Column(
+  Widget _buildAnimatedBackground() {
+    return AnimatedBuilder(
+      animation: _floatController,
+      builder: (context, child) {
+        return Stack(
           children: [
-            SizedBox(
-              height: 235,
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                children: [
-                  _buildUrlInputCard(context),
-                  _buildLastAnalysisCard(context),
-                ],
+            Positioned(
+              top: -100 + (_floatController.value * 50),
+              right: -50,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFF60A5FA).withOpacity(0.15),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildPageIndicator(0),
-                const SizedBox(width: 8),
-                _buildPageIndicator(1),
-              ],
+            Positioned(
+              bottom: 100 - (_floatController.value * 30),
+              left: -100,
+              child: Container(
+                width: 350,
+                height: 350,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFFA78BFA).withOpacity(0.12),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPageIndicator(int index) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: _currentPage == index ? 24 : 8,
-      height: 8,
-      decoration: BoxDecoration(
-        color: _currentPage == index
-            ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.onBackground.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
-  }
-
-  Widget _buildUrlInputCard(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.secondary,
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'AI-Powered Analysis',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Enter a URL to analyze',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: TextField(
-                controller: _urlController,
-                style: const TextStyle(color: Colors.black87),
-                decoration: InputDecoration(
-                  hintText: 'https://example.com',
-                  hintStyle: TextStyle(color: Colors.grey[600]),
-                  prefixIcon: Icon(Icons.link, color: Theme.of(context).colorScheme.primary),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.all(16),
-                ),
-                onSubmitted: (_) => _analyzeUrl(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _analyzeUrl,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Theme.of(context).colorScheme.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  'Analyze',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLastAnalysisCard(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.secondary,
-              Theme.of(context).colorScheme.primary,
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.history, color: Colors.white, size: 20),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Last Analysis',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'example.com/article',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Analyzed 2 hours ago',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Opening last analysis...'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Theme.of(context).colorScheme.secondary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  'View Details',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  SliverToBoxAdapter _buildSectionTitle(BuildContext context, String title) {
+  SliverToBoxAdapter _buildHeader() {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                AnimatedBuilder(
+                  animation: _pulseController,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: 1.0 + (math.sin(_pulseController.value * 2 * math.pi) * 0.05),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF60A5FA), Color(0xFFA78BFA)],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF60A5FA).withOpacity(0.5),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 28),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome back!',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.6),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Color(0xFF60A5FA), Color(0xFFA78BFA)],
+                      ).createShader(bounds),
+                      child: Text(
+                        'Aura',
+                        style: GoogleFonts.inter(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
-  SliverPadding _buildCategoryGrid(BuildContext context) {
+  SliverToBoxAdapter _buildHeroCard() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: AnimatedBuilder(
+          animation: _shimmerController,
+          builder: (context, child) {
+            return Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(32),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF60A5FA),
+                    const Color(0xFFA78BFA),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF60A5FA).withOpacity(0.4),
+                    blurRadius: 30,
+                    offset: const Offset(0, 15),
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Transform.rotate(
+                      angle: _shimmerController.value * 2 * math.pi,
+                      child: Icon(
+                        Icons.auto_awesome,
+                        size: 100,
+                        color: Colors.white.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(Icons.analytics_outlined, color: Colors.white, size: 24),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'AI Analysis',
+                            style: GoogleFonts.inter(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Unlock powerful insights with AI',
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          color: Colors.white.withOpacity(0.95),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _urlController,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF0F172A),
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Enter URL to analyze...',
+                            hintStyle: GoogleFonts.inter(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: const Icon(Icons.link_rounded, color: Color(0xFF60A5FA)),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.all(20),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_urlController.text.isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Analyzing: ${_urlController.text}'),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: const Color(0xFF1E293B),
+                                  margin: const EdgeInsets.only(bottom: 120, left: 16, right: 16),
+                                ),
+                              );
+                              _urlController.clear();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF60A5FA),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.rocket_launch_rounded, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Start Analysis',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildQuickStats() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          children: [
+            Expanded(child: _buildStatCard('127', 'Analyses', Icons.insights_rounded, const Color(0xFF60A5FA))),
+            const SizedBox(width: 12),
+            Expanded(child: _buildStatCard('4.8', 'Rating', Icons.star_rounded, const Color(0xFFFCD34D))),
+            const SizedBox(width: 12),
+            Expanded(child: _buildStatCard('23', 'Saved', Icons.bookmark_rounded, const Color(0xFFA78BFA))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String value, String label, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: Colors.white.withOpacity(0.6),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SliverToBoxAdapter _buildSectionTitle(String title) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: -0.5,
+          ),
+        ),
+      ),
+    );
+  }
+
+  SliverPadding _buildCategoryGrid() {
     final categories = [
-      {'icon': Icons.map_outlined, 'title': 'Maps', 'color': Colors.blue, 'screen': const MapsScreen()},
-      {'icon': Icons.restaurant_menu, 'title': 'Recipes', 'color': Colors.orange, 'screen': const RecipesScreen()},
-      {'icon': Icons.shopping_bag_outlined, 'title': 'Products', 'color': Colors.purple, 'screen': const ProductsScreen()},
-      {'icon': Icons.movie_outlined, 'title': 'Movies', 'color': Colors.red, 'screen': const MoviesScreen()},
-      {'icon': Icons.more_horiz, 'title': 'Others', 'color': Colors.teal, 'screen': null},
+      {'icon': Icons.map_rounded, 'title': 'Maps', 'color': const Color(0xFF60A5FA), 'screen': const MapsScreen()},
+      {'icon': Icons.restaurant_rounded, 'title': 'Recipes', 'color': const Color(0xFFF97316), 'screen': const RecipesScreen()},
+      {'icon': Icons.shopping_bag_rounded, 'title': 'Products', 'color': const Color(0xFFA78BFA), 'screen': const ProductsScreen()},
+      {'icon': Icons.movie_rounded, 'title': 'Movies', 'color': const Color(0xFFEF4444), 'screen': const MoviesScreen()},
+      {'icon': Icons.explore_rounded, 'title': 'Explore', 'color': const Color(0xFF14B8A6), 'screen': null},
+      {'icon': Icons.favorite_rounded, 'title': 'Favorites', 'color': const Color(0xFFEC4899), 'screen': null},
     ];
 
     return SliverPadding(
@@ -411,7 +443,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       sliver: SliverGrid(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 1.2,
+          childAspectRatio: 1.1,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
@@ -445,45 +477,68 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             SnackBar(
               content: Text('$title coming soon!'),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
+              backgroundColor: const Color(0xFF1E293B),
+              margin: const EdgeInsets.only(bottom: 120, left: 16, right: 16),
             ),
           );
         }
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withOpacity(0.15),
+              color.withOpacity(0.05),
+            ],
+          ),
           borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: color.withOpacity(0.3), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: color.withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
+            Positioned(
+              right: -10,
+              top: -10,
               child: Icon(
                 icon,
-                size: 32,
-                color: color,
+                size: 80,
+                color: color.withOpacity(0.1),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(icon, color: color, size: 28),
                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

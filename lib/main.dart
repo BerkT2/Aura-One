@@ -62,7 +62,9 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> with TickerProviderStateMixin {
   int _currentIndex = 0;
-  late AnimationController _navAnimationController;
+  late AnimationController _scaleController;
+  late AnimationController _slideController;
+  late List<AnimationController> _iconControllers;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -73,23 +75,46 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Ticker
   @override
   void initState() {
     super.initState();
-    _navAnimationController = AnimationController(
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _slideController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
+    _iconControllers = List.generate(
+      3,
+      (index) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    );
+    _iconControllers[0].forward();
   }
 
   @override
   void dispose() {
-    _navAnimationController.dispose();
+    _scaleController.dispose();
+    _slideController.dispose();
+    for (var controller in _iconControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   void _onItemTapped(int index) {
+    if (_currentIndex == index) return;
+    
+    _iconControllers[_currentIndex].reverse();
+    _iconControllers[index].forward();
+    
     setState(() {
       _currentIndex = index;
     });
-    _navAnimationController.forward(from: 0);
+    
+    _scaleController.forward(from: 0);
+    _slideController.forward(from: 0);
   }
 
   @override
@@ -103,60 +128,119 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Ticker
             children: _screens,
           ),
           Positioned(
-            left: 20,
-            right: 20,
-            bottom: 20,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  height: 72,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFF1E293B).withOpacity(0.85),
-                        const Color(0xFF0F172A).withOpacity(0.85),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: const Color(0xFF60A5FA).withOpacity(0.25),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                      BoxShadow(
-                        color: const Color(0xFF60A5FA).withOpacity(0.15),
-                        blurRadius: 30,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildNavItem(Icons.home_rounded, 0),
-                      _buildNavItem(Icons.explore_rounded, 1),
-                      _buildNavItem(Icons.person_rounded, 2),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            left: 24,
+            right: 24,
+            bottom: 32,
+            child: _buildModernNavBar(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, int index) {
+  Widget _buildModernNavBar() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          height: 80,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.1),
+                Colors.white.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              width: 1.5,
+              color: Colors.white.withOpacity(0.2),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 30,
+                offset: const Offset(0, 20),
+              ),
+              BoxShadow(
+                color: const Color(0xFF60A5FA).withOpacity(0.2),
+                blurRadius: 40,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeInOutCubic,
+                left: _getIndicatorPosition(),
+                top: 12,
+                child: Container(
+                  width: 100,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF60A5FA).withOpacity(0.8),
+                        const Color(0xFFA78BFA).withOpacity(0.8),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF60A5FA).withOpacity(0.5),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(
+                    icon: Icons.home_rounded,
+                    label: 'Home',
+                    index: 0,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.explore_rounded,
+                    label: 'Explore',
+                    index: 1,
+                  ),
+                  _buildNavItem(
+                    icon: Icons.person_rounded,
+                    label: 'Profile',
+                    index: 2,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  double _getIndicatorPosition() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final navBarWidth = screenWidth - 48;
+    final itemWidth = navBarWidth / 3;
+    return (_currentIndex * itemWidth) + (itemWidth / 2) - 50;
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
     final isSelected = _currentIndex == index;
 
     return Expanded(
@@ -164,56 +248,40 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Ticker
         onTap: () => _onItemTapped(index),
         behavior: HitTestBehavior.opaque,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                width: isSelected ? 64 : 56,
-                height: isSelected ? 40 : 36,
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            const Color(0xFF60A5FA).withOpacity(0.3),
-                            const Color(0xFFA78BFA).withOpacity(0.3),
-                          ],
-                        )
-                      : null,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Icon(
-                  icon,
-                  size: isSelected ? 26 : 24,
-                  color: isSelected
-                      ? const Color(0xFF60A5FA)
-                      : const Color(0xFFF8FAFC).withOpacity(0.4),
-                ),
-              ),
-              const SizedBox(height: 4),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: isSelected ? 6 : 0,
-                height: isSelected ? 6 : 0,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF60A5FA),
-                  shape: BoxShape.circle,
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: const Color(0xFF60A5FA).withOpacity(0.8),
-                            blurRadius: 8,
-                            spreadRadius: 2,
-                          ),
-                        ]
-                      : null,
-                ),
-              ),
-            ],
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: AnimatedBuilder(
+            animation: _iconControllers[index],
+            builder: (context, child) {
+              final animation = _iconControllers[index];
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Transform.scale(
+                    scale: 1.0 + (animation.value * 0.15),
+                    child: Icon(
+                      icon,
+                      size: 28,
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
+                    style: GoogleFonts.inter(
+                      fontSize: isSelected ? 13 : 12,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.5),
+                      letterSpacing: 0.5,
+                    ),
+                    child: Text(label),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
