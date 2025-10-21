@@ -126,33 +126,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   SliverToBoxAdapter _buildWelcomeSection(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Welcome back! 👋',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w300,
-                      color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
-                    ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'What would you like to explore today?',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return const SliverToBoxAdapter(
+      child: SizedBox(height: 8),
     );
   }
 
@@ -209,8 +184,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                   child: TextField(
                     controller: _urlController,
+                    style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       hintText: 'https://example.com',
+                      hintStyle: TextStyle(color: Colors.grey[600]),
                       prefixIcon: Icon(Icons.link, color: Theme.of(context).colorScheme.primary),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(16),
