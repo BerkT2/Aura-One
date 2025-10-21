@@ -139,90 +139,95 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Ticker
   }
 
   Widget _buildModernNavBar() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(32),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-        child: Container(
-          height: 80,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.1),
-                Colors.white.withOpacity(0.05),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(32),
-            border: Border.all(
-              width: 1.5,
-              color: Colors.white.withOpacity(0.2),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 30,
-                offset: const Offset(0, 20),
-              ),
-              BoxShadow(
-                color: const Color(0xFF60A5FA).withOpacity(0.2),
-                blurRadius: 40,
-                offset: const Offset(0, 10),
-              ),
-            ],
+    return Container(
+      height: 72,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 40,
+            offset: const Offset(0, 20),
           ),
-          child: Stack(
-            children: [
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeInOutCubic,
-                left: _getIndicatorPosition(),
-                top: 12,
-                child: Container(
-                  width: 100,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFF60A5FA).withOpacity(0.8),
-                        const Color(0xFFA78BFA).withOpacity(0.8),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF60A5FA).withOpacity(0.5),
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildNavItem(
-                    icon: Icons.home_rounded,
-                    label: 'Home',
-                    index: 0,
-                  ),
-                  _buildNavItem(
-                    icon: Icons.explore_rounded,
-                    label: 'Explore',
-                    index: 1,
-                  ),
-                  _buildNavItem(
-                    icon: Icons.person_rounded,
-                    label: 'Profile',
-                    index: 2,
-                  ),
+          BoxShadow(
+            color: const Color(0xFF60A5FA).withOpacity(0.25),
+            blurRadius: 50,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF1E293B).withOpacity(0.9),
+                  const Color(0xFF0F172A).withOpacity(0.95),
                 ],
               ),
-            ],
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                width: 1,
+                color: Colors.white.withOpacity(0.15),
+              ),
+            ),
+            child: Stack(
+              children: [
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeInOutCubic,
+                  left: _getIndicatorPosition(),
+                  top: 8,
+                  bottom: 8,
+                  child: Container(
+                    width: 90,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF60A5FA),
+                          Color(0xFFA78BFA),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF60A5FA).withOpacity(0.6),
+                          blurRadius: 25,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNavItem(
+                      icon: Icons.home_rounded,
+                      label: 'Home',
+                      index: 0,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.explore_rounded,
+                      label: 'Explore',
+                      index: 1,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.person_rounded,
+                      label: 'Profile',
+                      index: 2,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -233,7 +238,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Ticker
     final screenWidth = MediaQuery.of(context).size.width;
     final navBarWidth = screenWidth - 48;
     final itemWidth = navBarWidth / 3;
-    return (_currentIndex * itemWidth) + (itemWidth / 2) - 50;
+    return (_currentIndex * itemWidth) + (itemWidth / 2) - 45;
   }
 
   Widget _buildNavItem({
@@ -248,34 +253,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Ticker
         onTap: () => _onItemTapped(index),
         behavior: HitTestBehavior.opaque,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.only(top: 12),
           child: AnimatedBuilder(
             animation: _iconControllers[index],
             builder: (context, child) {
               final animation = _iconControllers[index];
               return Column(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Transform.scale(
-                    scale: 1.0 + (animation.value * 0.15),
+                    scale: 1.0 + (animation.value * 0.12),
                     child: Icon(
                       icon,
-                      size: 28,
+                      size: 26,
                       color: isSelected
                           ? Colors.white
-                          : Colors.white.withOpacity(0.5),
+                          : Colors.white.withOpacity(0.4),
                     ),
                   ),
                   const SizedBox(height: 6),
                   AnimatedDefaultTextStyle(
                     duration: const Duration(milliseconds: 300),
                     style: GoogleFonts.inter(
-                      fontSize: isSelected ? 13 : 12,
+                      fontSize: 11.5,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       color: isSelected
                           ? Colors.white
-                          : Colors.white.withOpacity(0.5),
-                      letterSpacing: 0.5,
+                          : Colors.white.withOpacity(0.4),
+                      letterSpacing: 0.3,
+                      height: 1,
                     ),
                     child: Text(label),
                   ),
