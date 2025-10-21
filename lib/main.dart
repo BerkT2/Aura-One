@@ -18,8 +18,10 @@ class AuraApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1), // Modern indigo color
+          seedColor: const Color(0xFF14C9C9), // New teal seed color
           brightness: Brightness.light,
+          primary: const Color(0xFF00796B),
+          secondary: const Color(0xFFF9A825),
         ),
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(),
@@ -32,8 +34,10 @@ class AuraApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1),
+          seedColor: const Color(0xFF14C9C9), // New teal seed color
           brightness: Brightness.dark,
+          primary: const Color(0xFF80CBC4),
+          secondary: const Color(0xFFFFCC80),
         ),
         useMaterial3: true,
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),

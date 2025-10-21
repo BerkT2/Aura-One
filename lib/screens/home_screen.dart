@@ -15,19 +15,28 @@ class HomeScreen extends StatelessWidget {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverAppBar.large(
-              title: Row(
-                children: [
-                  const Icon(Icons.auto_awesome),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Welcome to Aura One',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 16.0, left: 16.0, right: 16.0, bottom: 8.0), // Added top padding
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 28,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Welcome to Aura',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              floating: true,
             ),
             SliverPadding(
               padding: const EdgeInsets.all(16),
@@ -69,8 +78,8 @@ class HomeScreen extends StatelessWidget {
                               style: const TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                 hintText: 'Enter a URL',
-                                hintStyle:
-                                    TextStyle(color: Colors.white.withOpacity(0.7)),
+                                hintStyle: TextStyle(
+                                    color: Colors.white.withOpacity(0.7)),
                                 filled: true,
                                 fillColor: Colors.white.withOpacity(0.1),
                                 border: OutlineInputBorder(
@@ -113,8 +122,6 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
-
-                    // Section Title
                     Text(
                       'Quick Actions',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -122,99 +129,79 @@ class HomeScreen extends StatelessWidget {
                           ),
                     ),
                     const SizedBox(height: 16),
-
-                    // Quick Action Cards
-                    Column(
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 1.2,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildQuickActionCard(
+                        _buildQuickActionCard(
+                          context,
+                          Icons.map_outlined,
+                          'Maps',
+                          Colors.teal,
+                          () {
+                            Navigator.push(
                                 context,
-                                Icons.map_outlined,
-                                'Maps',
-                                Colors.green,
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const MapsScreen()),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildQuickActionCard(
-                                context,
-                                Icons.restaurant_menu,
-                                'Recipes',
-                                Colors.orange,
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const RecipesScreen()),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                                MaterialPageRoute(
+                                    builder: (context) => const MapsScreen()));
+                          },
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildQuickActionCard(
+                        _buildQuickActionCard(
+                          context,
+                          Icons.restaurant_menu,
+                          'Recipes',
+                          Colors.orange,
+                          () {
+                            Navigator.push(
                                 context,
-                                Icons.shopping_bag_outlined,
-                                'Products',
-                                Colors.blue,
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const ProductsScreen()),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildQuickActionCard(
-                                context,
-                                Icons.movie_outlined,
-                                'Movies',
-                                Colors.red,
-                                () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const MoviesScreen()),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RecipesScreen()));
+                          },
                         ),
-                        const SizedBox(height: 16),
+                        _buildQuickActionCard(
+                          context,
+                          Icons.shopping_bag_outlined,
+                          'Products',
+                          Colors.lightBlue,
+                          () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ProductsScreen()));
+                          },
+                        ),
+                        _buildQuickActionCard(
+                          context,
+                          Icons.movie_outlined,
+                          'Movies',
+                          Colors.redAccent,
+                          () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MoviesScreen()));
+                          },
+                        ),
                         _buildQuickActionCard(
                           context,
                           Icons.more_horiz,
                           'Other',
-                          Colors.grey,
+                          Colors.grey.shade600,
                           () {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const OtherScreen()),
-                            );
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const OtherScreen()));
                           },
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -232,41 +219,38 @@ class HomeScreen extends StatelessWidget {
     Color color,
     VoidCallback onTap,
   ) {
-    return AspectRatio(
-      aspectRatio: 1.2,
-      child: Card(
-        elevation: 0,
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 32,
-                    color: color,
-                  ),
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                  textAlign: TextAlign.center,
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: color,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),
