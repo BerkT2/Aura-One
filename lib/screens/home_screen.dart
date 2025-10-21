@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    top: 16.0, left: 16.0, right: 16.0, bottom: 8.0), // Added top padding
+                    top: 24.0, left: 16.0, right: 16.0, bottom: 8.0),
                 child: Row(
                   children: [
                     Icon(
@@ -32,7 +32,9 @@ class HomeScreen extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                          ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ],
                 ),
@@ -81,7 +83,7 @@ class HomeScreen extends StatelessWidget {
                                 hintStyle: TextStyle(
                                     color: Colors.white.withOpacity(0.7)),
                                 filled: true,
-                                fillColor: Colors.white.withOpacity(0.1),
+                                fillColor: Colors.white.withOpacity(0.15),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
@@ -126,6 +128,7 @@ class HomeScreen extends StatelessWidget {
                       'Quick Actions',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                     ),
                     const SizedBox(height: 16),
