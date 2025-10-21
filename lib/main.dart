@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/home_screen.dart';
@@ -19,13 +20,13 @@ class AuraApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF60A5FA), // Bright blue for dark mode
-          secondary: Color(0xFFA78BFA), // Purple accent
-          surface: Color(0xFF1E293B), // Deep cool grey
-          background: Color(0xFF0F172A), // Near-black background
+          primary: Color(0xFF60A5FA),
+          secondary: Color(0xFFA78BFA),
+          surface: Color(0xFF1E293B),
+          background: Color(0xFF0F172A),
           onPrimary: Color(0xFF0F172A),
           onSecondary: Color(0xFF0F172A),
-          onSurface: Color(0xFFF8FAFC), // Bright clear text
+          onSurface: Color(0xFFF8FAFC),
           onBackground: Color(0xFFF8FAFC),
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
@@ -34,13 +35,13 @@ class AuraApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF60A5FA), // Bright blue for dark mode
-          secondary: Color(0xFFA78BFA), // Purple accent
-          surface: Color(0xFF1E293B), // Deep cool grey
-          background: Color(0xFF0F172A), // Near-black background
+          primary: Color(0xFF60A5FA),
+          secondary: Color(0xFFA78BFA),
+          surface: Color(0xFF1E293B),
+          background: Color(0xFF0F172A),
           onPrimary: Color(0xFF0F172A),
           onSecondary: Color(0xFF0F172A),
-          onSurface: Color(0xFFF8FAFC), // Bright clear text
+          onSurface: Color(0xFFF8FAFC),
           onBackground: Color(0xFFF8FAFC),
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
@@ -59,8 +60,9 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _MainNavigationScreenState extends State<MainNavigationScreen> with TickerProviderStateMixin {
   int _currentIndex = 0;
+  late AnimationController _navAnimationController;
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -69,39 +71,151 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _navAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+  }
+
+  @override
+  void dispose() {
+    _navAnimationController.dispose();
+    super.dispose();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    _navAnimationController.forward(from: 0);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        elevation: 0,
-        height: 70,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+      extendBody: true,
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _currentIndex,
+            children: _screens,
           ),
-          NavigationDestination(
-            icon: Icon(Icons.explore_outlined),
-            selectedIcon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  height: 72,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFF1E293B).withOpacity(0.85),
+                        const Color(0xFF0F172A).withOpacity(0.85),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: const Color(0xFF60A5FA).withOpacity(0.25),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                      BoxShadow(
+                        color: const Color(0xFF60A5FA).withOpacity(0.15),
+                        blurRadius: 30,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildNavItem(Icons.home_rounded, 0),
+                      _buildNavItem(Icons.explore_rounded, 1),
+                      _buildNavItem(Icons.person_rounded, 2),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, int index) {
+    final isSelected = _currentIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                width: isSelected ? 64 : 56,
+                height: isSelected ? 40 : 36,
+                decoration: BoxDecoration(
+                  gradient: isSelected
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color(0xFF60A5FA).withOpacity(0.3),
+                            const Color(0xFFA78BFA).withOpacity(0.3),
+                          ],
+                        )
+                      : null,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Icon(
+                  icon,
+                  size: isSelected ? 26 : 24,
+                  color: isSelected
+                      ? const Color(0xFF60A5FA)
+                      : const Color(0xFFF8FAFC).withOpacity(0.4),
+                ),
+              ),
+              const SizedBox(height: 4),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: isSelected ? 6 : 0,
+                height: isSelected ? 6 : 0,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF60A5FA),
+                  shape: BoxShape.circle,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: const Color(0xFF60A5FA).withOpacity(0.8),
+                            blurRadius: 8,
+                            spreadRadius: 2,
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

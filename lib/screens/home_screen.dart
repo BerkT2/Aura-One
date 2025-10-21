@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           content: Text('Analyzing: ${_urlController.text}'),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
         ),
       );
       _urlController.clear();
@@ -62,11 +63,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildModernAppBar(context),
-          const SliverToBoxAdapter(child: SizedBox(height: 8)),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
           _buildCarouselSection(context),
           _buildSectionTitle(context, 'Explore'),
           _buildCategoryGrid(context),
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
     );
@@ -355,6 +356,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       content: const Text('Opening last analysis...'),
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
                     ),
                   );
                 },
@@ -444,6 +446,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               content: Text('$title coming soon!'),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
             ),
           );
         }
