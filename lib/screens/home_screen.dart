@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   SliverAppBar _buildModernAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: 95,
       floating: true,
       pinned: true,
       elevation: 0,
@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             child: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
+              titlePadding: const EdgeInsets.only(left: 24, bottom: 14),
               title: Row(
                 children: [
                   Container(
