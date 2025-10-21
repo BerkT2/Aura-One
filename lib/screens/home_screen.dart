@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
                   const Icon(Icons.auto_awesome),
                   const SizedBox(width: 8),
                   const Text(
-                    'Welcome to Aura',
+                    'Welcome to Aura One',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
