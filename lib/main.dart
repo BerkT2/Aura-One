@@ -18,13 +18,18 @@ class AuraApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1), // Modern indigo/purple color
+          seedColor: const Color(0xFF0057FF), // A strong, professional blue
           brightness: Brightness.light,
+          primary: const Color(0xFF0057FF),
+          surface: const Color(0xFFFFFFFF), 
+          background: const Color(0xFFF4F7FC), // A light grey background
+          onSurface: const Color(0xFF0D1117), // Dark text for readability
         ),
         useMaterial3: true,
-        textTheme: GoogleFonts.interTextTheme(),
+        textTheme: GoogleFonts.manropeTextTheme(), // A clean, modern font
         cardTheme: CardThemeData(
           elevation: 0,
+          color: const Color(0xFFFFFFFF),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -32,13 +37,18 @@ class AuraApp extends StatelessWidget {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1),
+          seedColor: const Color(0xFF4C8CFF),
           brightness: Brightness.dark,
+          primary: const Color(0xFF4C8CFF),
+          surface: const Color(0xFF161B22), // A dark, slightly blue surface
+          background: const Color(0xFF0D1117), // A deep black background
+          onSurface: const Color(0xFFE6EDF3),
         ),
         useMaterial3: true,
-        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        textTheme: GoogleFonts.manropeTextTheme(ThemeData.dark().textTheme),
         cardTheme: CardThemeData(
           elevation: 0,
+          color: const Color(0xFF161B22),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -69,47 +79,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _screens[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          elevation: 0,
-          height: 70,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.explore_outlined),
-              selectedIcon: Icon(Icons.explore),
-              label: 'Explore',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        elevation: 0,
+        height: 70,
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore_outlined),
+            selectedIcon: Icon(Icons.explore),
+            label: 'Explore',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
