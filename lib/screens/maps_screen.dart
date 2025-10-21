@@ -12,15 +12,11 @@ class MapsScreen extends StatefulWidget {
 }
 
 class _MapsScreenState extends State<MapsScreen> {
-  ml.LatLng? _currentPosition; // MapLibre'in LatLng'i
+  ml.LatLng? _currentPosition;
   String? _errorMessage;
 
-  // OpenFreeMap — host edilmiş, key'siz light stiller
-  static const _styleBright   = 'https://tiles.openfreemap.org/styles/bright';
-  static const _stylePositron = 'https://tiles.openfreemap.org/styles/positron';
-
-  // 0 = Bright, 1 = Positron (varsayılan)
-  int _styleIndex = 1;
+  // OpenFreeMap Bright (light, key'siz)
+  static const _styleBright = 'https://tiles.openfreemap.org/styles/bright';
 
   ml.MaplibreMapController? _mapController;
 
@@ -61,10 +57,6 @@ class _MapsScreenState extends State<MapsScreen> {
     }
   }
 
-  Future<void> _launchUrl(String url) async {
-    await launchUrl(Uri.parse(url));
-  }
-
   void _onMapCreated(ml.MaplibreMapController controller) {
     _mapController = controller;
     if (_currentPosition != null) {
@@ -77,9 +69,6 @@ class _MapsScreenState extends State<MapsScreen> {
       ml.CameraUpdate.newLatLngZoom(target, zoom),
     );
   }
-
-  String get _currentStyle =>
-      _styleIndex == 0 ? _styleBright : _stylePositron;
 
   @override
   Widget build(BuildContext context) {
@@ -96,30 +85,6 @@ class _MapsScreenState extends State<MapsScreen> {
               ),
               backgroundColor: Theme.of(context).colorScheme.surface,
               floating: true,
-              actions: [
-                PopupMenuButton<int>(
-                  tooltip: 'Map Style',
-                  icon: const Icon(Icons.layers),
-                  initialValue: _styleIndex,
-                  onSelected: (i) => setState(() => _styleIndex = i),
-                  itemBuilder: (ctx) => const [
-                    PopupMenuItem(
-                      value: 1,
-                      child: _StyleItem(
-                        icon: Icons.light_mode,
-                        label: 'Positron (Light, Minimal)',
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 0,
-                      child: _StyleItem(
-                        icon: Icons.map,
-                        label: 'Bright (Light)',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
             ),
             SliverFillRemaining(child: _buildMap()),
           ],
@@ -147,7 +112,7 @@ class _MapsScreenState extends State<MapsScreen> {
                 child: ListTile(
                   title: const Text('Attribution'),
                   subtitle: const Text(
-                    '© OpenStreetMap contributors • OpenFreeMap (OpenMapTiles styles)',
+                    '© OpenStreetMap contributors • OpenFreeMap (OpenMapTiles Bright Style)',
                   ),
                   onTap: () => Navigator.pop(context),
                 ),
@@ -169,7 +134,7 @@ class _MapsScreenState extends State<MapsScreen> {
     }
 
     return ml.MaplibreMap(
-      styleString: _currentStyle, // OpenFreeMap stil uçları
+      styleString: _styleBright, // sadece Bright stili
       initialCameraPosition: ml.CameraPosition(
         target: _currentPosition!,
         zoom: 15.0,
@@ -180,24 +145,6 @@ class _MapsScreenState extends State<MapsScreen> {
       compassEnabled: true,
       rotateGesturesEnabled: true,
       tiltGesturesEnabled: true,
-    );
-  }
-}
-
-// AppBar menüsü helper
-class _StyleItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _StyleItem({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18),
-        const SizedBox(width: 8),
-        Flexible(child: Text(label)),
-      ],
     );
   }
 }

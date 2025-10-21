@@ -96,8 +96,7 @@ class _RecipesScreenState extends State<RecipesScreen> with TickerProviderStateM
   }
 
   List<Map<String, dynamic>> get _filteredRecipes {
-    if (_selectedCategory == 'All') return _recipes;
-    return _recipes.where((recipe) => recipe['category'] == _selectedCategory).toList();
+    return _recipes;
   }
 
   @override
@@ -114,12 +113,10 @@ class _RecipesScreenState extends State<RecipesScreen> with TickerProviderStateM
                 _buildHeader(),
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 _buildSearchBar(),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                _buildCategoryTabs(),
-                const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
                 _buildFeaturedCard(),
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                _buildSectionTitle('Popular Recipes'),
+                _buildSectionTitle('All Recipes'),
                 const SliverToBoxAdapter(child: SizedBox(height: 16)),
                 _buildRecipeGrid(),
                 const SliverToBoxAdapter(child: SizedBox(height: 140)),
@@ -282,17 +279,6 @@ class _RecipesScreenState extends State<RecipesScreen> with TickerProviderStateM
                 fontWeight: FontWeight.w500,
               ),
               prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFFF97316)),
-              suffixIcon: Container(
-                margin: const EdgeInsets.all(8),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF97316), Color(0xFFEC4899)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.tune_rounded, color: Colors.white, size: 20),
-              ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(18),
             ),
@@ -429,26 +415,7 @@ class _RecipesScreenState extends State<RecipesScreen> with TickerProviderStateM
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Fresh, healthy, and delicious',
-                    style: GoogleFonts.inter(
-                      fontSize: 15,
-                      color: Colors.white.withOpacity(0.9),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
                   const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      _buildInfoChip(Icons.timer_outlined, '30 min'),
-                      const SizedBox(width: 12),
-                      _buildInfoChip(Icons.local_fire_department_rounded, '450 cal'),
-                      const SizedBox(width: 12),
-                      _buildInfoChip(Icons.star_rounded, '4.9'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
